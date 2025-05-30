@@ -1,39 +1,49 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { api } from '../services/api';
-import type { Course } from '../types/Course';
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import type { Course } from '../types/Course'
+import agent from '../services/agent' 
 
 const CourseDetail = () => {
-  const { id } = useParams<{ id: string }>();
-  const [course, setCourse] = useState<Course | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { id } = useParams<{ id: string }>()
+  const [course, setCourse] = useState<Course | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) return
 
-    api.get<Course>(`/courses/${id}`)
-      .then(response => {
-        setCourse(response.data);
-        setLoading(false);
+    agent.Courses.details(id)
+      .then((data) => {
+        setCourse(data)
+        setLoading(false)
       })
-      .catch(err => {
-        console.error("Failed to load course", err);
-        setLoading(false);
-      });
-  }, [id]);
+      .catch((err) => {
+        console.error('Failed to load course', err)
+        setLoading(false)
+      })
+  }, [id])
 
-  if (loading) return <p>Loading...</p>;
-  if (!course) return <p>Course not found.</p>;
+  if (loading) return <p className="p-4 text-gray-500">Loading...</p>
+  if (!course) return <p className="p-4 text-red-600">Course not found.</p>
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h2>{course.title}</h2>
-      <p><strong>Instructor:</strong> {course.instructor}</p>
-      <p><strong>Price:</strong> ${course.price}</p>
-      <p><strong>Rating:</strong> {course.rating}</p>
-      <img src={course.image} alt={course.title} width="300" />
+    <div className="p-8 bg-gray-100 min-h-screen">
+      <h2 className="text-2xl font-bold mb-4">{course.title}</h2>
+      <p className="mb-2">
+        <strong>Instructor:</strong> {course.instructor}
+      </p>
+      <p className="mb-2">
+        <strong>Price:</strong> ${course.price}
+      </p>
+      <p className="mb-4">
+        <strong>Rating:</strong> {course.rating}
+      </p>
+      <img
+        src={course.image}
+        alt={course.title}
+        className="rounded shadow w-full max-w-md"
+      />
     </div>
-  );
-};
+  )
+}
 
-export default CourseDetail;
+export default CourseDetail
